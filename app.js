@@ -87,8 +87,11 @@ const getDocument =  async () => {
         // .select({_id: 0 , name : 1});
         // console.log(result);
         const result = await Playlist
-        .find({videos : {$lt : 6}})
-        .select({_id: 0});
+        // .find({videos : {$lt : 6}})
+        .find()
+        .select({_id: 0})
+        .sort({videos : -1}) // to sort here 1 means ascending order and -1 means descending
+        // .countDocuments(); // to get count of documents
         console.log(result);
 
     }catch(err){
