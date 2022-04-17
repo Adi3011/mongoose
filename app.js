@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-
+const validator = require('validator')
 mongoose.connect("mongodb://127.0.0.1:27017/testmongo")
 .then( ( ) => console.log("connected succesfully") )
 .catch( (err) => console.log(err) );
@@ -14,8 +14,31 @@ const playlistSchema = new mongoose.Schema({
         required : true
     },
     ctype : String,
-    videos : Number,
+    videos : {
+        type : Number, 
+        validate(value){
+            if(value < 0){
+                throw new  Error("video count cannot be less than zero")
+            }
+        }
+        // validate : {
+        //     validator: function(value){
+        //         return value.length < 0 
+        //     },
+        //     message : "video count cannot be less than zero "
+        // }
+    },
     author : String,
+    email : {
+        type : String,
+        required : true,
+        unique : true,
+        validate(value){
+            if(!validator.isEmail(value)){
+                throw new Error("Email is invalid");
+            }
+        }
+    } ,
     active : Boolean,
     date : {
         type : Date,
@@ -41,6 +64,7 @@ const createDocument = async () => {
             ctype : "Back End",
             videos : 50,
             author : "Aman",
+            email :"aman@gmail.com",
             active : true
         })
         const mongoPlaylist = new Playlist({
@@ -48,6 +72,7 @@ const createDocument = async () => {
             ctype : "Database",
             videos : 20,
             author : "Anil",
+            email :"anil@gmail.com",
             active : true
         })
         const mongoosePlaylist = new Playlist({
@@ -55,6 +80,7 @@ const createDocument = async () => {
             ctype : "Database",
             videos : 5,
             author : "Amar",
+            email :"amar@gmail.com",
             active : true
         })
     
@@ -101,10 +127,56 @@ const getDocument =  async () => {
 }
 
 //get data
-getDocument();
+// getDocument();
 
 
 
+const updateDocument =  async (id) => {
+    try{
+        // const result = await Playlist.updateOne({_id : id}, {$set : { name : "Mongooose"}}); 
+        // this will not return record that is deleted
+
+        const result = await Playlist.findByIdAndUpdate({_id : id}, // this one will return the record that is updated
+            {
+                $set : {name : "Mongooose"}
+            },
+            { 
+                new : true, // returns modified document instead original
+                useFindAndModify : false
+            });
+        console.log(result);
+    }catch(err){
+        console.log(err);
+    }
+    
+}
+
+
+// updateDocument("625c2936adb430efa89a1b82")
+
+
+const deleteDocument =  async (id) => {
+    try{
+        // const result = await Playlist.DeleteOne({_id : id}, {$set : { name : "Mongooose"}}); 
+        // this will not return record that is deleted
+
+        const result = await Playlist.findByIdAndDelete({_id : id}, // this one will return the record that is updated
+            {
+                $set : {name : "Mongooose"}
+            },
+            { 
+                new : true, // returns modified document instead original
+                useFindAndModify : false
+            });
+        console.log(result);
+    }catch(err){
+        console.log(err);
+    }
+    
+}
+
+
+// deleteDocument("625c2936adb430efa89a1b82")
 
 
 
